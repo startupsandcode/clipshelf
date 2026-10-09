@@ -29,9 +29,14 @@ Right-click a card for the same actions. Left-click the tray icon to open the pi
 
 ## Data and settings
 
-- `%LOCALAPPDATA%\ClipShelf\history.db`: every clip, kept forever. Copying the same thing again moves it to the top instead of making a duplicate.
+- `%LOCALAPPDATA%\ClipShelf\history.db`: captured clips, kept until you delete them. Copying the same thing again moves it to the top instead of making a duplicate.
 - `%LOCALAPPDATA%\ClipShelf\settings.json`: `Hotkey` (e.g. `"Ctrl+Alt+V"`; restart to apply) and `Paused`.
-- Copies that apps mark as private, like those from password managers (`ExcludeClipboardContentFromMonitorProcessing`, `CanIncludeInClipboardHistory = 0`), are never saved.
+
+### Privacy
+
+ClipShelf saves clipboard history locally in an **unencrypted** SQLite database and keeps it until you delete it. It does not upload or sync your clips. Pause capture from the tray menu before copying anything you do not want saved. Deleting a clip removes it from the app's history, but does not securely erase it from the database, write-ahead log, or backups. The tray's Clear history command also keeps pinned clips.
+
+ClipShelf does **not** detect or filter passwords, API keys, access tokens, private keys, or other secrets. If you copy one, it may be saved in history. The only automatic exclusion is for copies that the source app explicitly marks as private (`ExcludeClipboardContentFromMonitorProcessing`, `Clipboard Viewer Ignore`, or `CanIncludeInClipboardHistory = 0`). Do not rely on every app to set those markers. Use Pause capture when you do not want a copy retained, and delete sensitive entries from history when you no longer need them.
 
 ## Build
 
