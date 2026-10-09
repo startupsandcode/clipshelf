@@ -1,0 +1,114 @@
+<Window x:Class="ClipShelf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ClipShelf" Height="320" Width="1200"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
+        FontFamily="Segoe UI" PreviewKeyDown="Window_PreviewKeyDown">
+
+    <Window.Resources>
+        <Style x:Key="CardContainer" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <ContentPresenter />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="CardTemplate">
+            <Border x:Name="Card" Width="236" Margin="0,0,12,0" CornerRadius="12"
+                    Background="#FF2A2A31" BorderThickness="3" BorderBrush="Transparent">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Border CornerRadius="9,9,0,0" Background="{Binding HeaderBrush}" Padding="11,7">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Right" Text="{Binding Shortcut}" Foreground="#B3FFFFFF"
+                                       FontSize="11" VerticalAlignment="Top" Margin="8,2,0,0" />
+                            <StackPanel>
+                                <TextBlock Text="{Binding KindLabel}" Foreground="White" FontWeight="SemiBold" FontSize="13" />
+                                <TextBlock Text="{Binding SourceLabel}" Foreground="#D9FFFFFF" FontSize="11"
+                                           TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+
+                    <Grid Grid.Row="1" Margin="11,9,11,4" ClipToBounds="True">
+                        <TextBlock Text="{Binding Preview}" Visibility="{Binding TextVisibility}" Foreground="#EBFFFFFF"
+                                   FontSize="12.5" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+                        <Image Source="{Binding Thumb}" Visibility="{Binding ImageVisibility}" Stretch="Uniform"
+                               RenderOptions.BitmapScalingMode="HighQuality" />
+                    </Grid>
+
+                    <DockPanel Grid.Row="2" Margin="11,2,11,8">
+                        <TextBlock DockPanel.Dock="Right" Text="PINNED" Visibility="{Binding PinVisibility}"
+                                   Foreground="#FFFFC857" FontSize="10" FontWeight="Bold" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding Meta}" Foreground="#8CFFFFFF" FontSize="11" TextTrimming="CharacterEllipsis" />
+                    </DockPanel>
+                </Grid>
+            </Border>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter TargetName="Card" Property="BorderBrush" Value="#FF5AA2FF" />
+                    <Setter TargetName="Card" Property="Background" Value="#FF32323A" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Border Background="#F219191E" CornerRadius="16" BorderBrush="#30FFFFFF" BorderThickness="1" Margin="0,0,0,12">
+        <Grid Margin="20,14,20,16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Foreground="#73FFFFFF" FontSize="11.5"
+                           Text="Enter paste   ·   Shift+Enter plain text   ·   Ctrl+P pin   ·   Ctrl+Del delete   ·   Tab pinned   ·   Esc close" />
+                <Border Width="340" Background="#1FFFFFFF" CornerRadius="8" Padding="10,6">
+                    <Grid>
+                        <TextBlock x:Name="Placeholder" Text="Search clipboard history" Foreground="#66FFFFFF"
+                                   FontSize="14" IsHitTestVisible="False" />
+                        <TextBox x:Name="Search" Background="Transparent" BorderThickness="0" Foreground="White"
+                                 CaretBrush="White" FontSize="14" Padding="-2,0,0,0" TextChanged="Search_TextChanged" />
+                    </Grid>
+                </Border>
+                <TextBlock x:Name="Status" Margin="16,0" VerticalAlignment="Center" Foreground="#A6FFFFFF" FontSize="12.5" />
+            </DockPanel>
+
+            <ListBox x:Name="List" Grid.Row="1" Margin="0,14,0,0" Background="Transparent" BorderThickness="0"
+                     ItemTemplate="{StaticResource CardTemplate}" ItemContainerStyle="{StaticResource CardContainer}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                     VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.ScrollUnit="Pixel"
+                     PreviewMouseWheel="List_PreviewMouseWheel" MouseDoubleClick="List_MouseDoubleClick"
+                     PreviewMouseLeftButtonUp="List_PreviewMouseLeftButtonUp">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ContextMenu>
+                    <ContextMenu Closed="ContextMenu_Closed">
+                        <MenuItem Header="Paste" Click="Menu_Paste" />
+                        <MenuItem Header="Paste as plain text" Click="Menu_PastePlain" />
+                        <MenuItem Header="Copy (don't paste)" Click="Menu_Copy" />
+                        <Separator />
+                        <MenuItem Header="Pin / unpin" Click="Menu_Pin" />
+                        <MenuItem Header="Delete" Click="Menu_Delete" />
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+            </ListBox>
+
+            <TextBlock x:Name="Empty" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Foreground="#80FFFFFF" FontSize="14" Visibility="Collapsed" />
+        </Grid>
+    </Border>
+</Window>
