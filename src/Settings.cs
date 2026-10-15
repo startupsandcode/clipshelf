@@ -12,6 +12,10 @@ public sealed class Settings
     public string Hotkey { get; set; } = "Ctrl+Shift+V";
     public bool Paused { get; set; }
 
+    /// <summary>Unpinned clips not used for this many days are deleted automatically. 0 turns cleanup off.</summary>
+    public int RetentionDays { get; set; } = 30;
+    public bool RetentionNoticeShown { get; set; }
+
     [JsonIgnore] public string FilePath { get; private set; } = "";
     [JsonIgnore] public bool IsNew { get; private set; }
 

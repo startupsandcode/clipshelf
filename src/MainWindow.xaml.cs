@@ -50,9 +50,12 @@ public partial class MainWindow : Window
         Placeholder.Visibility = Search.Text.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
         Empty.Visibility = items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         Empty.Text = query.Length > 0 ? $"No clips match \"{query}\""
-            : _pinnedOnly ? "No pinned clips yet. Select one and press Ctrl+P."
+            : _pinnedOnly ? "No saved clips yet. Select one and press Ctrl+P."
             : "Nothing yet. Copy something and it will show up here.";
-        Status.Text = $"{(_pinnedOnly ? "Pinned" : "All clips")}   ·   {_store.Count():N0} saved";
+        TabAllText.Text = $"All  {_store.Count():N0}";
+        TabSavedText.Text = $"Saved  {_store.CountPinned():N0}";
+        TabAll.Tag = _pinnedOnly ? null : "active";
+        TabSaved.Tag = _pinnedOnly ? "active" : null;
 
         if (items.Count > 0) Select(Math.Clamp(selectIndex, 0, items.Count - 1));
     }
@@ -135,6 +138,16 @@ public partial class MainWindow : Window
         viewer.ScrollToHorizontalOffset(viewer.HorizontalOffset - e.Delta);
         e.Handled = true;
     }
+
+    void SwitchTab(bool pinnedOnly)
+    {
+        _pinnedOnly = pinnedOnly;
+        Reload();
+        Search.Focus();
+    }
+
+    void TabAll_Click(object sender, MouseButtonEventArgs e) => SwitchTab(false);
+    void TabSaved_Click(object sender, MouseButtonEventArgs e) => SwitchTab(true);
 
     void List_MouseDoubleClick(object sender, MouseButtonEventArgs e) => Choose(ClipAction.Paste);
     void List_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) => Search.Focus();

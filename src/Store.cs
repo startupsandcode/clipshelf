@@ -105,6 +105,20 @@ public sealed class Store : IDisposable
     public void Delete(long id) => Exec("DELETE FROM clips WHERE id = $id", ("$id", id));
     public void ClearUnpinned() => Exec("DELETE FROM clips WHERE pinned = 0");
 
+    public long CountPinned()
+    {
+        using var cmd = Command("SELECT COUNT(*) FROM clips WHERE pinned = 1");
+        return (long)cmd.ExecuteScalar()!;
+    }
+
+    /// <summary>Deletes unpinned clips not used in the last <paramref name="days"/> days. Returns how many were removed.</summary>
+    public int PurgeStale(int days)
+    {
+        var cutoff = DateTimeOffset.UtcNow.AddDays(-days).ToUnixTimeMilliseconds();
+        using var cmd = Command("DELETE FROM clips WHERE pinned = 0 AND used < $cutoff", ("$cutoff", cutoff));
+        return cmd.ExecuteNonQuery();
+    }
+
     void Exec(string sql, params (string, object?)[] args)
     {
         using var cmd = Command(sql, args);

@@ -25,6 +25,7 @@ public partial class App : Application
     WF.ToolStripMenuItem? _pauseItem;
     WF.ToolStripMenuItem? _autostartItem;
     readonly DispatcherTimer _debounce = new() { Interval = TimeSpan.FromMilliseconds(150) };
+    readonly DispatcherTimer _purgeTimer = new() { Interval = TimeSpan.FromHours(24) };
     IntPtr _copySource;
     IntPtr _pasteTarget;
     DateTime _ignoreUntil;
@@ -55,6 +56,9 @@ public partial class App : Application
         Native.AddClipboardFormatListener(_messages.Handle);
 
         CreateTray();
+        PurgeStale();
+        _purgeTimer.Tick += (_, _) => PurgeStale();
+        _purgeTimer.Start();
         if (!Settings.TryParseHotkey(_settings.Hotkey, out uint mods, out uint vk) ||
             !Native.RegisterHotKey(_messages.Handle, HotkeyId, mods, vk))
         {
@@ -183,6 +187,18 @@ public partial class App : Application
         var answer = MessageBox.Show("Delete every clip that isn't pinned? This can't be undone.", "ClipShelf",
             MessageBoxButton.OKCancel, MessageBoxImage.Warning);
         if (answer == MessageBoxResult.OK) _store!.ClearUnpinned();
+    }
+
+    void PurgeStale()
+    {
+        if (_settings.RetentionDays <= 0) return;
+        int removed = _store!.PurgeStale(_settings.RetentionDays);
+        if (removed == 0) return;
+        if (_window!.IsVisible) _window.Reload();
+        if (_settings.RetentionNoticeShown) return;
+        _settings.RetentionNoticeShown = true;
+        _settings.Save();
+        Notify($"Removed {removed:N0} clips not used in {_settings.RetentionDays} days. Pinned clips are never removed. Change \"RetentionDays\" in settings.json (0 turns this off).");
     }
 
     void Notify(string message) => _tray?.ShowBalloonTip(4000, "ClipShelf", message, WF.ToolTipIcon.Info);

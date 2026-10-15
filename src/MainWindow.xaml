@@ -18,6 +18,22 @@
             </Setter>
         </Style>
 
+        <Style x:Key="Tab" TargetType="Border">
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1FFFFFFF" />
+                </Trigger>
+                <Trigger Property="Tag" Value="active">
+                    <Setter Property="Background" Value="#FF3A6FD8" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <DataTemplate x:Key="CardTemplate">
             <Border x:Name="Card" Width="236" Margin="0,0,12,0" CornerRadius="12"
                     Background="#FF2A2A31" BorderThickness="3" BorderBrush="Transparent">
@@ -48,7 +64,7 @@
                     </Grid>
 
                     <DockPanel Grid.Row="2" Margin="11,2,11,8">
-                        <TextBlock DockPanel.Dock="Right" Text="PINNED" Visibility="{Binding PinVisibility}"
+                        <TextBlock DockPanel.Dock="Right" Text="SAVED" Visibility="{Binding PinVisibility}"
                                    Foreground="#FFFFC857" FontSize="10" FontWeight="Bold" VerticalAlignment="Center" />
                         <TextBlock Text="{Binding Meta}" Foreground="#8CFFFFFF" FontSize="11" TextTrimming="CharacterEllipsis" />
                     </DockPanel>
@@ -72,7 +88,7 @@
 
             <DockPanel>
                 <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Foreground="#73FFFFFF" FontSize="11.5"
-                           Text="Enter paste   ·   Shift+Enter plain text   ·   Ctrl+P pin   ·   Ctrl+Del delete   ·   Tab pinned   ·   Esc close" />
+                           Text="Enter paste   ·   Shift+Enter plain text   ·   Ctrl+P save   ·   Ctrl+Del delete   ·   Tab switch tab   ·   Esc close" />
                 <Border Width="340" Background="#1FFFFFFF" CornerRadius="8" Padding="10,6">
                     <Grid>
                         <TextBlock x:Name="Placeholder" Text="Search clipboard history" Foreground="#66FFFFFF"
@@ -81,7 +97,14 @@
                                  CaretBrush="White" FontSize="14" Padding="-2,0,0,0" TextChanged="Search_TextChanged" />
                     </Grid>
                 </Border>
-                <TextBlock x:Name="Status" Margin="16,0" VerticalAlignment="Center" Foreground="#A6FFFFFF" FontSize="12.5" />
+                <StackPanel Orientation="Horizontal" Margin="16,0" VerticalAlignment="Center">
+                    <Border x:Name="TabAll" Style="{StaticResource Tab}" MouseLeftButtonUp="TabAll_Click">
+                        <TextBlock x:Name="TabAllText" Foreground="White" FontSize="13" />
+                    </Border>
+                    <Border x:Name="TabSaved" Style="{StaticResource Tab}" MouseLeftButtonUp="TabSaved_Click">
+                        <TextBlock x:Name="TabSavedText" Foreground="White" FontSize="13" />
+                    </Border>
+                </StackPanel>
             </DockPanel>
 
             <ListBox x:Name="List" Grid.Row="1" Margin="0,14,0,0" Background="Transparent" BorderThickness="0"
@@ -101,7 +124,7 @@
                         <MenuItem Header="Paste as plain text" Click="Menu_PastePlain" />
                         <MenuItem Header="Copy (don't paste)" Click="Menu_Copy" />
                         <Separator />
-                        <MenuItem Header="Pin / unpin" Click="Menu_Pin" />
+                        <MenuItem Header="Save / unsave (pin)" Click="Menu_Pin" />
                         <MenuItem Header="Delete" Click="Menu_Delete" />
                     </ContextMenu>
                 </ListBox.ContextMenu>

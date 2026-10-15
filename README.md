@@ -20,8 +20,8 @@ This builds the app into `%LOCALAPPDATA%\ClipShelf\app`, adds a Start menu short
 | Shift+Enter | Paste as plain text |
 | Ctrl+1 to Ctrl+9 | Paste that card |
 | Ctrl+C | Copy without pasting |
-| Ctrl+P | Pin / unpin |
-| Tab | Toggle All / Pinned |
+| Ctrl+P | Save (pin) / unsave |
+| Tab, or click a tab | Switch between the All and Saved tabs |
 | Ctrl+Del (or Del with empty search) | Delete clip |
 | Esc | Close |
 
@@ -29,12 +29,12 @@ Right-click a card for the same actions. Left-click the tray icon to open the pi
 
 ## Data and settings
 
-- `%LOCALAPPDATA%\ClipShelf\history.db`: captured clips, kept until you delete them. Copying the same thing again moves it to the top instead of making a duplicate.
-- `%LOCALAPPDATA%\ClipShelf\settings.json`: `Hotkey` (e.g. `"Ctrl+Alt+V"`; restart to apply) and `Paused`.
+- `%LOCALAPPDATA%\ClipShelf\history.db`: captured clips. Copying the same thing again moves it to the top instead of making a duplicate. Clips you haven't used (pasted or copied) in 30 days are deleted automatically, at startup and then daily, unless they are saved (pinned).
+- `%LOCALAPPDATA%\ClipShelf\settings.json`: `Hotkey` (e.g. `"Ctrl+Alt+V"`; restart to apply), `Paused`, and `RetentionDays` (default `30`; `0` turns automatic cleanup off; restart to apply).
 
 ### Privacy
 
-ClipShelf saves clipboard history locally in an **unencrypted** SQLite database and keeps it until you delete it. It does not upload or sync your clips. Pause capture from the tray menu before copying anything you do not want saved. Deleting a clip removes it from the app's history, but does not securely erase it from the database, write-ahead log, or backups. The tray's Clear history command also keeps pinned clips.
+ClipShelf saves clipboard history locally in an **unencrypted** SQLite database and keeps it until you delete it or it goes unused for `RetentionDays` (30 by default; saved clips are kept indefinitely). It does not upload or sync your clips. Pause capture from the tray menu before copying anything you do not want saved. Deleting a clip removes it from the app's history, but does not securely erase it from the database, write-ahead log, or backups. The tray's Clear history command also keeps pinned clips.
 
 ClipShelf does **not** detect or filter passwords, API keys, access tokens, private keys, or other secrets. If you copy one, it may be saved in history. The only automatic exclusion is for copies that the source app explicitly marks as private (`ExcludeClipboardContentFromMonitorProcessing`, `Clipboard Viewer Ignore`, or `CanIncludeInClipboardHistory = 0`). Do not rely on every app to set those markers. Use Pause capture when you do not want a copy retained, and delete sensitive entries from history when you no longer need them.
 
