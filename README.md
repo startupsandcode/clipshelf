@@ -41,3 +41,7 @@ ClipShelf does **not** detect or filter passwords, API keys, access tokens, priv
 ## Build
 
 .NET 8 SDK. `dotnet build src\ClipShelf.csproj`. `tools\make-icon.ps1` regenerates `src\icon.ico`.
+
+## License
+
+[MIT](LICENSE)
